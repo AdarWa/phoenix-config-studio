@@ -55,44 +55,6 @@ export type DeviceConfig = Record<string, FieldValue>
 
 const enumCase = (token: string) => token.replace(/\s+/g, '_').toUpperCase()
 
-const motorKotlin = (config: DeviceConfig) => {
-  const inverted = config.inverted ? 'Clockwise_Positive' : 'CounterClockwise_Positive'
-  const neutralMode = enumCase(String(config.neutralMode ?? 'Coast'))
-
-  return `val talonFxConfig = TalonFXConfiguration().apply {
-    motorOutput.withInverted(InvertedValue.${inverted})
-    motorOutput.withNeutralMode(NeutralModeValue.${neutralMode})
-
-    currentLimits.withSupplyCurrentLimit(${config.supplyCurrentLimit})
-    currentLimits.withSupplyCurrentLimitEnable(true)
-
-    openLoopRamps.withOpenLoopRampPeriod(${config.openLoopRampRate})
-    closedLoopRamps.withClosedLoopRampPeriod(${config.closedLoopRampRate})
-
-    slot0 = Slot0Configs().apply {
-        kP = ${config.kP}
-        kI = ${config.kI}
-        kD = ${config.kD}
-        kV = ${config.kF}
-    }
-
-    feedback.withSensorToMechanismRatio(${config.sensorToMechanismRatio})
-}`
-}
-
-const cancoderKotlin = (config: DeviceConfig) => {
-  const sensorDirection = enumCase(String(config.sensorDirection ?? 'Counter Clockwise Positive'))
-
-  return `val cancoderConfig = CANcoderConfiguration().apply {
-    magnetSensor.withAbsoluteSensorRange(AbsoluteSensorRangeValue.Unsigned_0To1)
-    magnetSensor.withMagnetOffset(${config.magnetOffset})
-    magnetSensor.withSensorDirection(SensorDirectionValue.${sensorDirection})
-
-    dutyCyclePeriod.withGrain(${config.statusFrameRate})
-    initializationStrategy = SensorInitializationStrategyValue.${enumCase(String(config.initStrategy ?? 'Boot to Absolute Position'))}
-}`
-}
-
 export const createDefaultConfig = (definition: DeviceDefinition): DeviceConfig => {
   return definition.sections.reduce<DeviceConfig>((acc, section) => {
     section.fields.forEach((field) => {
