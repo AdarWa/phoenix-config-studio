@@ -1,9 +1,13 @@
 <!-- eslint-disable vue/no-deprecated-filter -->
 <template>
   <n-card>
+    <h1 class="header">Phoenix Config Studio</h1>
     <n-space vertical size="large" style="width: 100%">
+      <label for="device-select">Device Type:</label>
       <n-select
         v-model:value="currentDefinition"
+        id="device-select"
+        placeholder="Select a device"
         :options="deviceList.map((d) => ({ label: d.label, value: d.key }))"
       />
       <ConfigCollapse v-model="activePanels">
@@ -185,5 +189,9 @@ export default defineComponent({
 .device-section__helper {
   margin: 0;
   color: var(--n-text-color-3);
+}
+
+.header {
+  text-align: center;
 }
 </style>
