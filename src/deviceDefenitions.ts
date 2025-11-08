@@ -1173,5 +1173,6 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
         ],
       },
     ],
+    kotlinFactory: () => '',
   },
 }
