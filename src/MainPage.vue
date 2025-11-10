@@ -105,6 +105,7 @@ import ConfigSelectInput from './components/inputs/ConfigSelectInput.vue'
 import ConfigTextInput from './components/inputs/ConfigTextInput.vue'
 import { deviceDefinitions } from './deviceDefenitions'
 import { createInitialState, type DeviceConfig, type DeviceKey, type FieldValue } from './devices'
+import { jsonToKotlin } from './snippetMaker'
 
 const STORAGE_KEY = 'phoenixDeviceConfigs'
 type CollapseValue = string | number | Array<string | number> | null | undefined
@@ -152,13 +153,15 @@ export default defineComponent({
 
     const saveConfig = () => {
       try {
-
         Object.keys(configs).forEach((key: string)=>{
           if(key != currentDefinition.value){
             delete configs[key as DeviceKey]
           }
         });
+        const arr = configs[currentDefinition.value]
+        if(!arr) return;
         const json = JSON.stringify(configs);
+        console.log(jsonToKotlin(configs.motor))
         localStorage.setItem(STORAGE_KEY, json);
         console.log(json);
         console.log('Configuration saved');

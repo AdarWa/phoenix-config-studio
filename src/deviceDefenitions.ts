@@ -19,6 +19,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: false,
             falseLabel: 'CounterClockwise Positive',
             trueLabel: 'Clockwise Positive',
+            useBoolean: false
           },
           {
             type: 'boolean',
@@ -28,6 +29,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: false,
             falseLabel: 'Coast',
             trueLabel: 'Brake',
+            useBoolean: false
           },
           {
             type: 'number',
@@ -102,6 +104,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: true,
             trueLabel: 'Enabled',
             falseLabel: 'Disabled',
+            useBoolean: true
           },
           {
             type: 'number',
@@ -123,6 +126,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: true,
             trueLabel: 'Enabled',
             falseLabel: 'Disabled',
+            useBoolean: true
           },
           {
             type: 'number',
@@ -523,6 +527,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: false,
             trueLabel: 'Enabled',
             falseLabel: 'Disabled',
+            useBoolean: true
           },
           {
             type: 'number',
@@ -544,6 +549,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: true,
             trueLabel: 'Enabled',
             falseLabel: 'Disabled',
+            useBoolean: true
           },
           {
             type: 'select',
@@ -589,6 +595,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: false,
             trueLabel: 'Enabled',
             falseLabel: 'Disabled',
+            useBoolean: true
           },
           {
             type: 'number',
@@ -610,6 +617,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: true,
             trueLabel: 'Enabled',
             falseLabel: 'Disabled',
+            useBoolean: true
           },
           {
             type: 'select',
@@ -654,6 +662,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: false,
             trueLabel: 'Enabled',
             falseLabel: 'Disabled',
+            useBoolean: true
           },
           {
             key: 'ReverseSoftLimitEnable',
@@ -664,6 +673,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: false,
             trueLabel: 'Enabled',
             falseLabel: 'Disabled',
+            useBoolean: true
           },
           {
             key: 'ForwardSoftLimitThreshold',
@@ -792,6 +802,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: false,
             trueLabel: 'Enabled',
             falseLabel: 'Disabled',
+            useBoolean: true
           },
         ],
       },

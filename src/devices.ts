@@ -28,6 +28,7 @@ export interface BooleanField extends BaseField {
   type: 'boolean'
   trueLabel?: string
   falseLabel?: string
+  useBoolean: boolean
 }
 
 export interface TextField extends BaseField {
@@ -53,8 +54,6 @@ export interface DeviceDefinition {
 
 export type DeviceConfig = Record<string, SectionConfig>
 export type SectionConfig = Record<string, FieldValue>
-
-const enumCase = (token: string) => token.replace(/\s+/g, '_').toUpperCase()
 
 export const createDefaultConfig = (definition: DeviceDefinition): DeviceConfig => {
   return definition.sections.reduce<DeviceConfig>((acc, section) => {
