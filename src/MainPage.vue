@@ -1,3 +1,5 @@
+<!-- eslint-disable @typescript-eslint/no-unused-vars -->
+<!-- eslint-disable @typescript-eslint/no-unused-vars -->
 <!-- eslint-disable vue/no-deprecated-filter -->
 <template>
   <n-card class="config-card">
@@ -158,8 +160,25 @@ export default defineComponent({
             delete configs[key as DeviceKey]
           }
         });
-        const arr = configs[currentDefinition.value]
-        if(!arr) return;
+        Object.entries(configs[currentDefinition.value]).forEach(([sectionTitle, sectionConfig]) => {
+          Object.entries(sectionConfig).forEach(([fieldKey, value]) => {
+            const deviceDef = deviceDefinitions[currentDefinition.value as DeviceKey]
+            if (!deviceDef) return
+            const sectionDef = deviceDef.sections.find((s) => s.title === sectionTitle)
+            if (!sectionDef) return
+            const fieldDef = sectionDef.fields.find((f) => f.key === fieldKey)
+            if (!fieldDef) return
+
+            if (fieldDef.type === 'boolean') {
+              if (fieldDef.useBoolean === true) {
+                sectionConfig[fieldKey] = value as unknown as FieldValue
+              } else {
+                sectionConfig[fieldKey] = (value ? fieldDef.trueLabel : fieldDef.falseLabel) as FieldValue
+              }
+            }
+          })
+        })
+
         const json = JSON.stringify(configs);
         console.log(jsonToKotlin(configs.motor))
         localStorage.setItem(STORAGE_KEY, json);
