@@ -1,14 +1,17 @@
 type JsonValue = string | number | boolean | JsonObject;
 type JsonObject = { [key: string]: JsonValue | JsonObject };
 
+const enumCase = (token: string) => token.replace(/\s+/g, '_')
+
 export function toKotlinValue(value: JsonValue, key: string): string {
   if (typeof value === "string") {
     if(!/^[A-Za-z_][A-Za-z0-9_]*$/.test(value)){
-
+        value = enumCase(value);
     }
-    return  ? `${key}Value.${value}` : `"${value}"`;
+    return `${key}Value.${value}`;
   }
   if (typeof value === "boolean") return value ? "true" : "false";
+  if (typeof value === "number") return String(value.toFixed())
   return String(value);
 }
 
