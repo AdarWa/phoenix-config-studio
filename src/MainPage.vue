@@ -33,7 +33,14 @@
             >
               <template #header>
                 <div class="device-section__header">
-                  <h3>{{ section.title }}</h3>
+                  <div class="device-section__title">
+                    <h3>{{ section.title }}</h3>
+                    <span
+                      v-if="isSectionDirty(definition.key, section.title)"
+                      class="dirty-indicator"
+                      aria-label="Modified section"
+                    ></span>
+                  </div>
                   <p v-if="section.helper" class="device-section__helper">{{ section.helper }}</p>
                 </div>
               </template>
@@ -50,6 +57,7 @@
                       v-if="field.type === 'number'"
                       :field="field"
                       :model-value="configs[definition.key][section.title]?.[field.key] as number"
+                      :dirty="isFieldDirty(definition.key, section.title, field.key)"
                       @update:model-value="
                         (value: number) =>
                           setFieldValue(definition.key, field.key, section.title, value)
@@ -62,6 +70,7 @@
                       :model-value="
                         configs[definition.key][section.title]?.[field.key] as string | number
                       "
+                      :dirty="isFieldDirty(definition.key, section.title, field.key)"
                       @update:model-value="
                         (value: string | number | null) =>
                           setFieldValue(
@@ -77,6 +86,7 @@
                       v-else-if="field.type === 'boolean'"
                       :field="field"
                       :model-value="configs[definition.key][section.title]?.[field.key] as boolean"
+                      :dirty="isFieldDirty(definition.key, section.title, field.key)"
                       @update:model-value="
                         (value: boolean) =>
                           setFieldValue(definition.key, field.key, section.title, value)
@@ -87,6 +97,7 @@
                       v-else-if="field.type === 'text'"
                       :field="field"
                       :model-value="configs[definition.key][section.title]?.[field.key] as string"
+                      :dirty="isFieldDirty(definition.key, section.title, field.key)"
                       @update:model-value="
                         (value: string) =>
                           setFieldValue(definition.key, field.key, section.title, value)
@@ -111,7 +122,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref } from 'vue'
+import { defineComponent, reactive, ref } from 'vue'
 import ConfigNumberInput from './components/inputs/ConfigNumberInput.vue'
 import ConfigBooleanInput from './components/inputs/ConfigBooleanInput.vue'
 import ConfigSelectInput from './components/inputs/ConfigSelectInput.vue'
@@ -121,7 +132,6 @@ import { deviceDefinitions } from './deviceDefenitions'
 import { createInitialState, type DeviceConfig, type DeviceKey, type FieldValue } from './devices'
 import { jsonToKotlin } from './snippetMaker'
 
-const STORAGE_KEY = 'phoenixDeviceConfigs'
 type CollapseValue = string | number | Array<string | number> | null | undefined
 
 export default defineComponent({
@@ -136,6 +146,7 @@ export default defineComponent({
   setup() {
     const deviceList = Object.values(deviceDefinitions)
     const configs = reactive<Record<DeviceKey, DeviceConfig>>(createInitialState())
+    const defaultConfigs = createInitialState()
     const firstDevice = deviceList[0]
     const currentDefinition = ref<DeviceKey>('motor')
     const showModal = ref(false)
@@ -164,6 +175,70 @@ export default defineComponent({
           : []
     }
 
+    const getFieldDefinition = (device: DeviceKey, sectionKey: string, fieldKey: string) => {
+      const deviceDef = deviceDefinitions[device]
+      const sectionDef = deviceDef?.sections.find((section) => section.title === sectionKey)
+      return sectionDef?.fields.find((field) => field.key === fieldKey)
+    }
+
+    const serializeFieldValue = (
+      device: DeviceKey,
+      sectionKey: string,
+      fieldKey: string,
+      value: FieldValue,
+    ): FieldValue => {
+      const fieldDef = getFieldDefinition(device, sectionKey, fieldKey)
+      if (!fieldDef) return value
+      if (fieldDef.type === 'boolean' && fieldDef.useBoolean !== true) {
+        if (typeof value === 'boolean') {
+          return (value ? fieldDef.trueLabel : fieldDef.falseLabel) ?? (value ? 'true' : 'false')
+        }
+        return value
+      }
+      return value
+    }
+
+    const buildSnippetConfig = (device: DeviceKey, source: DeviceConfig | undefined) => {
+      const result: DeviceConfig = {}
+      const definition = deviceDefinitions[device]
+      if (!definition || !source) return result
+      for (const section of definition.sections) {
+        const sectionConfig = source[section.title]
+        if (!sectionConfig) continue
+        const serializedSection: Record<string, FieldValue> = {}
+        for (const field of section.fields) {
+          if (sectionConfig[field.key] === undefined) continue
+          serializedSection[field.key] = serializeFieldValue(
+            device,
+            section.title,
+            field.key,
+            sectionConfig[field.key] as FieldValue,
+          )
+        }
+        if (Object.keys(serializedSection).length > 0) {
+          result[section.title] = serializedSection
+        }
+      }
+      return result
+    }
+
+    const stripDefaultValues = (config: DeviceConfig, defaults: DeviceConfig): DeviceConfig => {
+      const result: DeviceConfig = {}
+      for (const [sectionKey, fields] of Object.entries(config)) {
+        const defaultSection = defaults[sectionKey] ?? {}
+        const filteredFields: Record<string, FieldValue> = {}
+        for (const [fieldKey, value] of Object.entries(fields)) {
+          if (!Object.is(value, defaultSection[fieldKey])) {
+            filteredFields[fieldKey] = value
+          }
+        }
+        if (Object.keys(filteredFields).length > 0) {
+          result[sectionKey] = filteredFields
+        }
+      }
+      return result
+    }
+
     const setFieldValue = (
       device: DeviceKey,
       fieldKey: string,
@@ -172,6 +247,22 @@ export default defineComponent({
     ) => {
       if (!configs[device][sectionKey]) return
       configs[device][sectionKey][fieldKey] = value
+    }
+
+    const isFieldDirty = (device: DeviceKey, sectionKey: string, fieldKey: string): boolean => {
+      const defaultSection = defaultConfigs[device]?.[sectionKey]
+      const currentSection = configs[device]?.[sectionKey]
+      if (!defaultSection || !currentSection) return false
+      return !Object.is(currentSection[fieldKey], defaultSection[fieldKey])
+    }
+
+    const isSectionDirty = (device: DeviceKey, sectionKey: string): boolean => {
+      const defaultSection = defaultConfigs[device]?.[sectionKey]
+      const currentSection = configs[device]?.[sectionKey]
+      if (!defaultSection || !currentSection) return false
+      return Object.keys(defaultSection).some(
+        (fieldKey) => !Object.is(currentSection[fieldKey], defaultSection[fieldKey]),
+      )
     }
 
     const saveConfig = () => {
@@ -191,23 +282,30 @@ export default defineComponent({
             const fieldDef = sectionDef.fields.find((f) => f.key === fieldKey)
             if (!fieldDef) return
 
-            if (fieldDef.type === 'boolean') {
-              if (fieldDef.useBoolean === true) {
-                sectionConfig[fieldKey] = value as unknown as FieldValue
-              } else {
-                sectionConfig[fieldKey] = (
-                  value ? fieldDef.trueLabel : fieldDef.falseLabel
-                ) as FieldValue
-              }
+            if (fieldDef.type === 'boolean' && fieldDef.useBoolean !== true) {
+              sectionConfig[fieldKey] = serializeFieldValue(
+                currentDefinition.value,
+                sectionTitle,
+                fieldKey,
+                value as FieldValue,
+              )
             }
           })
         })
 
         const json = JSON.stringify(clone)
-        localStorage.setItem(STORAGE_KEY, json)
         console.log(json)
-        codeSnippet.value = jsonToKotlin(
+        const snippetConfig = buildSnippetConfig(
+          currentDefinition.value,
           clone[currentDefinition.value],
+        )
+        const defaultSnippetConfig = buildSnippetConfig(
+          currentDefinition.value,
+          defaultConfigs[currentDefinition.value],
+        )
+        const trimmedConfig = stripDefaultValues(snippetConfig, defaultSnippetConfig)
+        codeSnippet.value = jsonToKotlin(
+          trimmedConfig,
           deviceDefinitions[currentDefinition.value].rootName,
         )
         showModal.value = true
@@ -223,23 +321,6 @@ export default defineComponent({
         Object.assign(configs[key], defaults[key])
       }
     }
-
-    onMounted(() => {
-      const saved = localStorage.getItem(STORAGE_KEY)
-      if (!saved) return
-      try {
-        const parsed = JSON.parse(saved) as Partial<Record<DeviceKey, DeviceConfig>>
-        for (const key of Object.keys(parsed) as DeviceKey[]) {
-          const deviceConfig = parsed[key]
-          if (deviceConfig) {
-            configs[key] = deviceConfig
-          }
-        }
-      } catch (error) {
-        console.error('Failed to parse saved configuration', error)
-      }
-    })
-
     return {
       deviceList,
       configs,
@@ -249,6 +330,8 @@ export default defineComponent({
       codeSnippet,
       updateSectionPanels,
       setFieldValue,
+      isFieldDirty,
+      isSectionDirty,
       saveConfig,
       resetConfig,
     }
@@ -294,6 +377,12 @@ export default defineComponent({
   gap: 4px;
 }
 
+.device-section__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .device-section__header h3 {
   margin: 0 0 4px;
   font-size: 16px;
@@ -317,5 +406,19 @@ export default defineComponent({
 
 .header {
   text-align: center;
+}
+
+:global(.dirty-indicator) {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff5f5f;
+  display: inline-block;
+}
+
+:global(.form-item-label) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 </style>

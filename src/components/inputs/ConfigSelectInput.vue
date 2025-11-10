@@ -4,6 +4,12 @@
     :feedback="field.description"
     :show-feedback="Boolean(field.description)"
   >
+    <template #label>
+      <span class="form-item-label">
+        {{ field.label }}
+        <span v-if="dirty" class="dirty-indicator" aria-label="Field modified"></span>
+      </span>
+    </template>
     <n-select v-model:value="localValue" :options="field.options" v-bind="selectProps" />
   </n-form-item>
 </template>
@@ -18,6 +24,7 @@ const props = withDefaults(
     field: SelectField
     modelValue: string | number | null
     selectProps?: SelectProps
+    dirty?: boolean
   }>(),
   {
     selectProps: () => ({}),

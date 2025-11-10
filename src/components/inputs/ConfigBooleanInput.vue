@@ -4,6 +4,12 @@
     :feedback="field.description"
     :show-feedback="Boolean(field.description)"
   >
+    <template #label>
+      <span class="form-item-label">
+        {{ field.label }}
+        <span v-if="dirty" class="dirty-indicator" aria-label="Field modified"></span>
+      </span>
+    </template>
     <n-switch v-model:value="localValue" :checked-value="true" :unchecked-value="false">
       <template v-if="field.trueLabel" #checked>{{ field.trueLabel }}</template>
       <template v-if="field.falseLabel" #unchecked>{{ field.falseLabel }}</template>
@@ -18,6 +24,7 @@ import type { BooleanField } from '../../devices'
 const props = defineProps<{
   field: BooleanField
   modelValue: boolean
+  dirty?: boolean
 }>()
 
 const emit = defineEmits<{

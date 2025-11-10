@@ -4,6 +4,12 @@
     :feedback="field.description"
     :show-feedback="Boolean(field.description)"
   >
+    <template #label>
+      <span class="form-item-label">
+        {{ field.label }}
+        <span v-if="dirty" class="dirty-indicator" aria-label="Field modified"></span>
+      </span>
+    </template>
     <n-input v-model:value="localValue" :placeholder="field.placeholder" v-bind="inputProps" />
   </n-form-item>
 </template>
@@ -18,6 +24,7 @@ const props = withDefaults(
     field: TextField
     modelValue: string
     inputProps?: InputProps
+    dirty?: boolean
   }>(),
   {
     inputProps: () => ({}),
