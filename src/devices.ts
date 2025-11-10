@@ -51,18 +51,22 @@ export interface DeviceDefinition {
   kotlinFactory: (config: DeviceConfig) => string
 }
 
-export type DeviceConfig = Record<string, FieldValue>
+export type DeviceConfig = Record<string, SectionConfig>
+export type SectionConfig = Record<string, FieldValue>
 
 const enumCase = (token: string) => token.replace(/\s+/g, '_').toUpperCase()
 
 export const createDefaultConfig = (definition: DeviceDefinition): DeviceConfig => {
   return definition.sections.reduce<DeviceConfig>((acc, section) => {
+    const sectionConfig: SectionConfig = {}
     section.fields.forEach((field) => {
-      acc[field.key] = field.defaultValue
+      sectionConfig[field.key] = field.defaultValue
     })
+    acc[section.title] = sectionConfig
     return acc
   }, {})
 }
+
 
 export const createInitialState = (): Record<DeviceKey, DeviceConfig> => {
   return Object.entries(deviceDefinitions).reduce<Record<DeviceKey, DeviceConfig>>(

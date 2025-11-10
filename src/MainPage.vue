@@ -47,37 +47,37 @@
                     <ConfigNumberInput
                       v-if="field.type === 'number'"
                       :field="field"
-                      :model-value="configs[definition.key][field.key] as number"
+                      :model-value="configs[definition.key][section.title]?.[field.key] as number"
                       @update:model-value="
-                        (value: number) => setFieldValue(definition.key, field.key, value)
+                        (value: number) => setFieldValue(definition.key, field.key,section.title, value)
                       "
                     />
 
                     <ConfigSelectInput
                       v-else-if="field.type === 'select'"
                       :field="field"
-                      :model-value="configs[definition.key][field.key] as string | number"
+                      :model-value="configs[definition.key][section.title]?.[field.key] as string | number"
                       @update:model-value="
                         (value: string | number | null) =>
-                          setFieldValue(definition.key, field.key, value ?? field.defaultValue)
+                          setFieldValue(definition.key, field.key, section.title, value ?? field.defaultValue)
                       "
                     />
 
                     <ConfigBooleanInput
                       v-else-if="field.type === 'boolean'"
                       :field="field"
-                      :model-value="configs[definition.key][field.key] as boolean"
+                      :model-value="configs[definition.key][section.title]?.[field.key] as boolean"
                       @update:model-value="
-                        (value: boolean) => setFieldValue(definition.key, field.key, value)
+                        (value: boolean) => setFieldValue(definition.key, field.key, section.title, value)
                       "
                     />
 
                     <ConfigTextInput
                       v-else-if="field.type === 'text'"
                       :field="field"
-                      :model-value="configs[definition.key][field.key] as string"
+                      :model-value="configs[definition.key][section.title]?.[field.key] as string"
                       @update:model-value="
-                        (value: string) => setFieldValue(definition.key, field.key, value)
+                        (value: string) => setFieldValue(definition.key, field.key, section.title, value)
                       "
                     />
                   </template>
@@ -121,7 +121,7 @@ export default defineComponent({
     const deviceList = Object.values(deviceDefinitions)
     const configs = reactive<Record<DeviceKey, DeviceConfig>>(createInitialState())
     const firstDevice = deviceList[0]
-    const currentDefinition = ref<string>('motor')
+    const currentDefinition = ref<DeviceKey>('motor')
     if (firstDevice) {
       currentDefinition.value = firstDevice.key
     }
@@ -133,7 +133,6 @@ export default defineComponent({
       }
       return result
     }
-
     const openSections = reactive<Record<DeviceKey, Array<string | number>>>(
       buildInitialSectionState(),
     )
@@ -146,16 +145,25 @@ export default defineComponent({
           : []
     }
 
-    const setFieldValue = (device: DeviceKey, fieldKey: string, value: FieldValue) => {
-      configs[device][fieldKey] = value
+    const setFieldValue = (device: DeviceKey, fieldKey: string, sectionKey: string, value: FieldValue) => {
+      if(!configs[device][sectionKey]) return;
+      configs[device][sectionKey][fieldKey] = value;
     }
 
     const saveConfig = () => {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(configs))
-        console.log('Configuration saved')
+
+        Object.keys(configs).forEach((key: string)=>{
+          if(key != currentDefinition.value){
+            delete configs[key as DeviceKey]
+          }
+        });
+        const json = JSON.stringify(configs);
+        localStorage.setItem(STORAGE_KEY, json);
+        console.log(json);
+        console.log('Configuration saved');
       } catch (error) {
-        console.error('Failed to save configuration', error)
+        console.error('Failed to save configuration', error);
       }
     }
 
@@ -174,7 +182,7 @@ export default defineComponent({
         for (const key of Object.keys(parsed) as DeviceKey[]) {
           const deviceConfig = parsed[key]
           if (deviceConfig) {
-            Object.assign(configs[key], deviceConfig)
+            configs[key] = deviceConfig;
           }
         }
       } catch (error) {
