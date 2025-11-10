@@ -1,48 +1,33 @@
-# phoenix-config-studio
+# Phoenix Config Studio
 
-This template should help get you started developing with Vue 3 in Vite.
+Single-page Vue 3 app for assembling Phoenix device configuration snippets and exporting them as Kotlin code.
 
-## Recommended IDE Setup
+![Image1](imgs/image.png)
+![Image2](imgs/image2.png)
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Features
 
-## Recommended Browser Setup
+- Section-by-section editors with Naive UI form controls, validation defaults.
+- Save action trims untouched defaults, and shows a modal preview of the Kotlin snippet.
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+## Quick start
 
-## Type Support for `.vue` Imports in TS
+Use the Github Pages app already deployed:
+[Phoenix Config Studio](https://adarwa.github.io/phoenix-config-studio/)
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+Or deploy your own instance:
 
 ```sh
-npm install
+npm install          # install deps
+npm run dev          # start Vite dev server
+npm run lint         # run eslint + oxlint
+npm run build        # production bundle
+npm run preview      # serve the built bundle
 ```
 
-### Compile and Hot-Reload for Development
+## Tech stack
 
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+- [Vue 3](https://vuejs.org/)
+- [Vite](https://vitejs.dev/) for dev server + build.
+- [Naive UI](https://www.naiveui.com/) for the component library.
+- ESLint + Oxlint + Prettier for linting and formatting.
