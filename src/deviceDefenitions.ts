@@ -4,6 +4,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
   motor: {
     key: 'motor',
     label: 'TalonFX',
+    rootName: 'TalonFXConfiguration',
     summary: 'Configure TalonFX Motor',
     sections: [
       {
@@ -1110,11 +1111,11 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
         ],
       },
     ],
-    kotlinFactory: () => '',
   },
   cancoder: {
     key: 'cancoder',
     label: 'CANCoder',
+    rootName: 'CANcoderConfiguration',
     summary: 'Configure CANCoder',
     sections: [
       {
@@ -1123,16 +1124,15 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
           'Configs that affect the magnet sensor and how to interpret it, including sensor direction, discontinuity point, and magnet offset.',
         fields: [
           {
+            type: 'boolean',
             key: 'SensorDirection',
-            type: 'select',
             label: 'Sensor Direction',
             description:
               'Direction of the sensor to determine positive rotation, as seen facing the LED side of the CANcoder.',
-            defaultValue: 'CounterClockwise_Positive',
-            options: [
-              { label: 'CounterClockwise_Positive', value: 'CounterClockwise_Positive' },
-              { label: 'Clockwise_Positive', value: 'Clockwise_Positive' },
-            ],
+            defaultValue: false,
+            falseLabel: 'CounterClockwise Positive',
+            trueLabel: 'Clockwise Positive',
+            useBoolean: false,
           },
           {
             key: 'MagnetOffset',
@@ -1184,6 +1184,5 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
         ],
       },
     ],
-    kotlinFactory: () => '',
   },
 }

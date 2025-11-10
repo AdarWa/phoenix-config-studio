@@ -176,38 +176,40 @@ export default defineComponent({
 
     const saveConfig = () => {
       try {
-        Object.keys(configs).forEach((key: string) => {
+        const clone = JSON.parse(JSON.stringify(configs)) as Record<DeviceKey, DeviceConfig>
+        Object.keys(clone).forEach((key: string) => {
           if (key != currentDefinition.value) {
-            delete configs[key as DeviceKey]
+            delete clone[key as DeviceKey]
           }
         })
-        Object.entries(configs[currentDefinition.value]).forEach(
-          ([sectionTitle, sectionConfig]) => {
-            Object.entries(sectionConfig).forEach(([fieldKey, value]) => {
-              const deviceDef = deviceDefinitions[currentDefinition.value as DeviceKey]
-              if (!deviceDef) return
-              const sectionDef = deviceDef.sections.find((s) => s.title === sectionTitle)
-              if (!sectionDef) return
-              const fieldDef = sectionDef.fields.find((f) => f.key === fieldKey)
-              if (!fieldDef) return
+        Object.entries(clone[currentDefinition.value]).forEach(([sectionTitle, sectionConfig]) => {
+          Object.entries(sectionConfig).forEach(([fieldKey, value]) => {
+            const deviceDef = deviceDefinitions[currentDefinition.value as DeviceKey]
+            if (!deviceDef) return
+            const sectionDef = deviceDef.sections.find((s) => s.title === sectionTitle)
+            if (!sectionDef) return
+            const fieldDef = sectionDef.fields.find((f) => f.key === fieldKey)
+            if (!fieldDef) return
 
-              if (fieldDef.type === 'boolean') {
-                if (fieldDef.useBoolean === true) {
-                  sectionConfig[fieldKey] = value as unknown as FieldValue
-                } else {
-                  sectionConfig[fieldKey] = (
-                    value ? fieldDef.trueLabel : fieldDef.falseLabel
-                  ) as FieldValue
-                }
+            if (fieldDef.type === 'boolean') {
+              if (fieldDef.useBoolean === true) {
+                sectionConfig[fieldKey] = value as unknown as FieldValue
+              } else {
+                sectionConfig[fieldKey] = (
+                  value ? fieldDef.trueLabel : fieldDef.falseLabel
+                ) as FieldValue
               }
-            })
-          },
-        )
+            }
+          })
+        })
 
-        const json = JSON.stringify(configs)
+        const json = JSON.stringify(clone)
         localStorage.setItem(STORAGE_KEY, json)
         console.log(json)
-        codeSnippet.value = jsonToKotlin(configs[currentDefinition.value])
+        codeSnippet.value = jsonToKotlin(
+          clone[currentDefinition.value],
+          deviceDefinitions[currentDefinition.value].rootName,
+        )
         showModal.value = true
         console.log('Configuration saved')
       } catch (error) {

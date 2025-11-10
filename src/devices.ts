@@ -46,10 +46,10 @@ export interface SectionDefinition {
 
 export interface DeviceDefinition {
   key: DeviceKey
+  rootName: string
   label: string
   summary: string
   sections: SectionDefinition[]
-  kotlinFactory: (config: DeviceConfig) => string
 }
 
 export type DeviceConfig = Record<string, SectionConfig>
@@ -66,7 +66,6 @@ export const createDefaultConfig = (definition: DeviceDefinition): DeviceConfig 
   }, {})
 }
 
-
 export const createInitialState = (): Record<DeviceKey, DeviceConfig> => {
   return Object.entries(deviceDefinitions).reduce<Record<DeviceKey, DeviceConfig>>(
     (acc, [key, definition]) => {
@@ -75,8 +74,4 @@ export const createInitialState = (): Record<DeviceKey, DeviceConfig> => {
     },
     {} as Record<DeviceKey, DeviceConfig>,
   )
-}
-
-export const buildKotlinSnippet = (device: DeviceKey, config: DeviceConfig): string => {
-  return deviceDefinitions[device].kotlinFactory(config)
 }
