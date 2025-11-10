@@ -3,7 +3,10 @@ type JsonObject = { [key: string]: JsonValue | JsonObject };
 
 export function toKotlinValue(value: JsonValue, key: string): string {
   if (typeof value === "string") {
-    return /^[A-Za-z_][A-Za-z0-9_]*$/.test(value) ? `${key}Value.${value}` : `"${value}"`;
+    if(!/^[A-Za-z_][A-Za-z0-9_]*$/.test(value)){
+
+    }
+    return  ? `${key}Value.${value}` : `"${value}"`;
   }
   if (typeof value === "boolean") return value ? "true" : "false";
   return String(value);
