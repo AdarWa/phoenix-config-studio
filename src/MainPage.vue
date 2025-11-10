@@ -51,17 +51,25 @@
                       :field="field"
                       :model-value="configs[definition.key][section.title]?.[field.key] as number"
                       @update:model-value="
-                        (value: number) => setFieldValue(definition.key, field.key,section.title, value)
+                        (value: number) =>
+                          setFieldValue(definition.key, field.key, section.title, value)
                       "
                     />
 
                     <ConfigSelectInput
                       v-else-if="field.type === 'select'"
                       :field="field"
-                      :model-value="configs[definition.key][section.title]?.[field.key] as string | number"
+                      :model-value="
+                        configs[definition.key][section.title]?.[field.key] as string | number
+                      "
                       @update:model-value="
                         (value: string | number | null) =>
-                          setFieldValue(definition.key, field.key, section.title, value ?? field.defaultValue)
+                          setFieldValue(
+                            definition.key,
+                            field.key,
+                            section.title,
+                            value ?? field.defaultValue,
+                          )
                       "
                     />
 
@@ -70,7 +78,8 @@
                       :field="field"
                       :model-value="configs[definition.key][section.title]?.[field.key] as boolean"
                       @update:model-value="
-                        (value: boolean) => setFieldValue(definition.key, field.key, section.title, value)
+                        (value: boolean) =>
+                          setFieldValue(definition.key, field.key, section.title, value)
                       "
                     />
 
@@ -79,7 +88,8 @@
                       :field="field"
                       :model-value="configs[definition.key][section.title]?.[field.key] as string"
                       @update:model-value="
-                        (value: string) => setFieldValue(definition.key, field.key, section.title, value)
+                        (value: string) =>
+                          setFieldValue(definition.key, field.key, section.title, value)
                       "
                     />
                   </template>
@@ -97,6 +107,7 @@
       </n-space>
     </div>
   </n-card>
+  <CodeModal v-model:show="showModal" title="Kotlin" language="kotlin" :code="codeSnippet" />
 </template>
 
 <script lang="ts">
@@ -105,6 +116,7 @@ import ConfigNumberInput from './components/inputs/ConfigNumberInput.vue'
 import ConfigBooleanInput from './components/inputs/ConfigBooleanInput.vue'
 import ConfigSelectInput from './components/inputs/ConfigSelectInput.vue'
 import ConfigTextInput from './components/inputs/ConfigTextInput.vue'
+import CodeModal from './components/CodeModal.vue'
 import { deviceDefinitions } from './deviceDefenitions'
 import { createInitialState, type DeviceConfig, type DeviceKey, type FieldValue } from './devices'
 import { jsonToKotlin } from './snippetMaker'
@@ -119,12 +131,16 @@ export default defineComponent({
     ConfigBooleanInput,
     ConfigSelectInput,
     ConfigTextInput,
+    CodeModal,
   },
   setup() {
     const deviceList = Object.values(deviceDefinitions)
     const configs = reactive<Record<DeviceKey, DeviceConfig>>(createInitialState())
     const firstDevice = deviceList[0]
     const currentDefinition = ref<DeviceKey>('motor')
+    const showModal = ref(false)
+
+    const codeSnippet = ref<string>('// Something is wrong...')
     if (firstDevice) {
       currentDefinition.value = firstDevice.key
     }
@@ -148,44 +164,54 @@ export default defineComponent({
           : []
     }
 
-    const setFieldValue = (device: DeviceKey, fieldKey: string, sectionKey: string, value: FieldValue) => {
-      if(!configs[device][sectionKey]) return;
-      configs[device][sectionKey][fieldKey] = value;
+    const setFieldValue = (
+      device: DeviceKey,
+      fieldKey: string,
+      sectionKey: string,
+      value: FieldValue,
+    ) => {
+      if (!configs[device][sectionKey]) return
+      configs[device][sectionKey][fieldKey] = value
     }
 
     const saveConfig = () => {
       try {
-        Object.keys(configs).forEach((key: string)=>{
-          if(key != currentDefinition.value){
+        Object.keys(configs).forEach((key: string) => {
+          if (key != currentDefinition.value) {
             delete configs[key as DeviceKey]
           }
-        });
-        Object.entries(configs[currentDefinition.value]).forEach(([sectionTitle, sectionConfig]) => {
-          Object.entries(sectionConfig).forEach(([fieldKey, value]) => {
-            const deviceDef = deviceDefinitions[currentDefinition.value as DeviceKey]
-            if (!deviceDef) return
-            const sectionDef = deviceDef.sections.find((s) => s.title === sectionTitle)
-            if (!sectionDef) return
-            const fieldDef = sectionDef.fields.find((f) => f.key === fieldKey)
-            if (!fieldDef) return
-
-            if (fieldDef.type === 'boolean') {
-              if (fieldDef.useBoolean === true) {
-                sectionConfig[fieldKey] = value as unknown as FieldValue
-              } else {
-                sectionConfig[fieldKey] = (value ? fieldDef.trueLabel : fieldDef.falseLabel) as FieldValue
-              }
-            }
-          })
         })
+        Object.entries(configs[currentDefinition.value]).forEach(
+          ([sectionTitle, sectionConfig]) => {
+            Object.entries(sectionConfig).forEach(([fieldKey, value]) => {
+              const deviceDef = deviceDefinitions[currentDefinition.value as DeviceKey]
+              if (!deviceDef) return
+              const sectionDef = deviceDef.sections.find((s) => s.title === sectionTitle)
+              if (!sectionDef) return
+              const fieldDef = sectionDef.fields.find((f) => f.key === fieldKey)
+              if (!fieldDef) return
 
-        const json = JSON.stringify(configs);
-        console.log(jsonToKotlin(configs.motor))
-        localStorage.setItem(STORAGE_KEY, json);
-        console.log(json);
-        console.log('Configuration saved');
+              if (fieldDef.type === 'boolean') {
+                if (fieldDef.useBoolean === true) {
+                  sectionConfig[fieldKey] = value as unknown as FieldValue
+                } else {
+                  sectionConfig[fieldKey] = (
+                    value ? fieldDef.trueLabel : fieldDef.falseLabel
+                  ) as FieldValue
+                }
+              }
+            })
+          },
+        )
+
+        const json = JSON.stringify(configs)
+        localStorage.setItem(STORAGE_KEY, json)
+        console.log(json)
+        codeSnippet.value = jsonToKotlin(configs[currentDefinition.value])
+        showModal.value = true
+        console.log('Configuration saved')
       } catch (error) {
-        console.error('Failed to save configuration', error);
+        console.error('Failed to save configuration', error)
       }
     }
 
@@ -204,7 +230,7 @@ export default defineComponent({
         for (const key of Object.keys(parsed) as DeviceKey[]) {
           const deviceConfig = parsed[key]
           if (deviceConfig) {
-            configs[key] = deviceConfig;
+            configs[key] = deviceConfig
           }
         }
       } catch (error) {
@@ -217,6 +243,8 @@ export default defineComponent({
       configs,
       currentDefinition,
       openSections,
+      showModal,
+      codeSnippet,
       updateSectionPanels,
       setFieldValue,
       saveConfig,

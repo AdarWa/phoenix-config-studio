@@ -80,14 +80,14 @@
       "MotionMagicExpo_kV": 0.12,
       "MotionMagicExpo_kA": 0.1
     },
-    "Custom Params": {
+    "Custom Params Configs": {
       "CustomParam0": 0,
       "CustomParam1": 0
     },
     "Closed Loop General Configs": {
       "ContinuousWrap": false
     },
-    "Slot 0 Gains": {
+    "Slot 0 Configs": {
       "kP": 0,
       "kI": 0,
       "kD": 0,
@@ -98,7 +98,7 @@
       "GravityType": "Elevator_Static",
       "StaticFeedforwardSign": "UseVelocitySign"
     },
-    "Slot 1 Gains": {
+    "Slot 1 Configs": {
       "kP": 0,
       "kI": 0,
       "kD": 0,
@@ -109,7 +109,7 @@
       "GravityType": "Elevator_Static",
       "StaticFeedforwardSign": "UseVelocitySign"
     },
-    "Slot 2 Gains": {
+    "Slot 2 Configs": {
       "kP": 0,
       "kI": 0,
       "kD": 0,

@@ -19,7 +19,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: false,
             falseLabel: 'CounterClockwise Positive',
             trueLabel: 'Clockwise Positive',
-            useBoolean: false
+            useBoolean: false,
           },
           {
             type: 'boolean',
@@ -29,7 +29,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: false,
             falseLabel: 'Coast',
             trueLabel: 'Brake',
-            useBoolean: false
+            useBoolean: false,
           },
           {
             type: 'number',
@@ -104,7 +104,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: true,
             trueLabel: 'Enabled',
             falseLabel: 'Disabled',
-            useBoolean: true
+            useBoolean: true,
           },
           {
             type: 'number',
@@ -126,7 +126,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: true,
             trueLabel: 'Enabled',
             falseLabel: 'Disabled',
-            useBoolean: true
+            useBoolean: true,
           },
           {
             type: 'number',
@@ -527,7 +527,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: false,
             trueLabel: 'Enabled',
             falseLabel: 'Disabled',
-            useBoolean: true
+            useBoolean: true,
           },
           {
             type: 'number',
@@ -549,7 +549,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: true,
             trueLabel: 'Enabled',
             falseLabel: 'Disabled',
-            useBoolean: true
+            useBoolean: true,
           },
           {
             type: 'select',
@@ -595,7 +595,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: false,
             trueLabel: 'Enabled',
             falseLabel: 'Disabled',
-            useBoolean: true
+            useBoolean: true,
           },
           {
             type: 'number',
@@ -617,7 +617,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: true,
             trueLabel: 'Enabled',
             falseLabel: 'Disabled',
-            useBoolean: true
+            useBoolean: true,
           },
           {
             type: 'select',
@@ -662,7 +662,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: false,
             trueLabel: 'Enabled',
             falseLabel: 'Disabled',
-            useBoolean: true
+            useBoolean: true,
           },
           {
             key: 'ReverseSoftLimitEnable',
@@ -673,7 +673,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: false,
             trueLabel: 'Enabled',
             falseLabel: 'Disabled',
-            useBoolean: true
+            useBoolean: true,
           },
           {
             key: 'ForwardSoftLimitThreshold',
@@ -762,7 +762,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
         ],
       },
       {
-        title: 'Custom Params',
+        title: 'Custom Params Configs',
         helper:
           'Custom parameters that have no real impact on controller. Provided to allow end-applications to store persistent information in the device.',
         fields: [
@@ -802,12 +802,12 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
             defaultValue: false,
             trueLabel: 'Enabled',
             falseLabel: 'Disabled',
-            useBoolean: true
+            useBoolean: true,
           },
         ],
       },
       {
-        title: 'Slot 0 Gains',
+        title: 'Slot 0 Configs',
         helper:
           'Gains for the specified slot. If this slot is selected, these gains are used in closed loop control requests.',
         fields: [
@@ -908,7 +908,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
         ],
       },
       {
-        title: 'Slot 1 Gains',
+        title: 'Slot 1 Configs',
         helper:
           'Gains for the specified slot. If this slot is selected, these gains are used in closed loop control requests.',
         fields: [
@@ -1009,7 +1009,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
         ],
       },
       {
-        title: 'Slot 2 Gains',
+        title: 'Slot 2 Configs',
         helper:
           'Gains for the specified slot. If this slot is selected, these gains are used in closed loop control requests.',
         fields: [
@@ -1159,7 +1159,7 @@ export const deviceDefinitions: Record<DeviceKey, DeviceDefinition> = {
         ],
       },
       {
-        title: 'Custom Params',
+        title: 'Custom Params Configs',
         helper:
           'Custom parameters that have no real impact on controller, used to store persistent information in the device.',
         fields: [
