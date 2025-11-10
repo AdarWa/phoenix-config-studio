@@ -4,7 +4,9 @@
     :feedback="field.description"
     :show-feedback="Boolean(field.description)"
   >
-    <n-input-number v-model:value="localValue" v-bind="numberProps" />
+    <n-input-number v-model:value="localValue" v-bind="numberProps">
+      <template v-if="props.field.suffix" #suffix>{{ props.field.suffix }}</template>
+    </n-input-number>
   </n-form-item>
 </template>
 
@@ -25,7 +27,6 @@ const numberProps = computed(() => ({
   min: props.field.min,
   max: props.field.max,
   step: props.field.step,
-  suffix: props.field.suffix,
 }))
 
 const localValue = computed({
