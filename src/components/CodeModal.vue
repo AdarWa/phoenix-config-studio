@@ -9,12 +9,13 @@
       aria-modal="true"
     >
       <template #header-extra>
-        {{ title }}
+        {{ currentLanguage }}
+        <n-button type="primary" style="margin-left: 10px;" @click="changeLang">{{currentLanguage === 'Kotlin' ? 'JSON' : 'Kotlin'}}</n-button>
       </template>
 
       <div class="code-wrapper">
         <div class="code-container">
-          <n-code :code="code" :language="language" show-line-numbers word-wrap />
+          <n-code :code="currentLanguage === 'Kotlin' ? code : jsonCode" :language="currentLanguage.toLowerCase()" show-line-numbers word-wrap />
         </div>
       </div>
 
@@ -32,17 +33,22 @@
 import { ref, watch } from 'vue'
 import { NModal, NCard, NButton, NCode, useMessage } from 'naive-ui'
 
+type SnippetLanguage = 'Kotlin' | 'JSON'
+
 interface Props {
   show: boolean
   title?: string
-  code: string
-  language?: string
+  code: string,
+  jsonCode: string
+  language?: string,
 }
 
 const props = withDefaults(defineProps<Props>(), {
   title: 'Kotlin Example',
   language: 'kotlin',
 })
+
+const currentLanguage = ref<SnippetLanguage>('Kotlin')
 
 const emit = defineEmits(['update:show', 'close'])
 const visible = ref(props.show)
@@ -62,6 +68,14 @@ function copyCode() {
 function onClose() {
   visible.value = false
   emit('close')
+}
+
+function changeLang(){
+  if(currentLanguage.value == "Kotlin"){
+    currentLanguage.value = "JSON";
+  }else {
+    currentLanguage.value = "Kotlin";
+  }
 }
 </script>
 

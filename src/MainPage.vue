@@ -118,7 +118,7 @@
       </n-space>
     </div>
   </n-card>
-  <CodeModal v-model:show="showModal" title="Kotlin" language="kotlin" :code="codeSnippet" />
+  <CodeModal v-model:show="showModal" title="Kotlin" language="kotlin" :code="codeSnippet" :json-code="jsonSnippet" />
 </template>
 
 <script lang="ts">
@@ -152,6 +152,7 @@ export default defineComponent({
     const showModal = ref(false)
 
     const codeSnippet = ref<string>('// Something is wrong...')
+    const jsonSnippet = ref<string>('{}')
     if (firstDevice) {
       currentDefinition.value = firstDevice.key
     }
@@ -308,6 +309,7 @@ export default defineComponent({
           trimmedConfig,
           deviceDefinitions[currentDefinition.value].rootName,
         )
+        jsonSnippet.value = JSON.stringify(trimmedConfig, null, 2)
         showModal.value = true
         console.log('Configuration saved')
       } catch (error) {
@@ -328,6 +330,7 @@ export default defineComponent({
       openSections,
       showModal,
       codeSnippet,
+      jsonSnippet,
       updateSectionPanels,
       setFieldValue,
       isFieldDirty,

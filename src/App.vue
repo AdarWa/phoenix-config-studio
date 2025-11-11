@@ -12,6 +12,8 @@ import { darkTheme } from 'naive-ui'
 import MainPage from './MainPage.vue'
 import hljs from 'highlight.js/lib/core'
 import kotlin from 'highlight.js/lib/languages/kotlin'
+import json from 'highlight.js/lib/languages/json'
 
 hljs.registerLanguage('kotlin', kotlin)
+hljs.registerLanguage('json', json)
 </script>
